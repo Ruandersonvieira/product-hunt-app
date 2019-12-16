@@ -68,7 +68,11 @@ export default class Main extends Component {
 
     const {docs, ...productInfo} = response.data;
 
-    this.setState({products: docs, productInfo, page});
+    this.setState({
+      products: [...this.state.products, ...docs],
+      productInfo,
+      page,
+    });
   };
 
   renderItem = ({item}) => (
@@ -81,6 +85,18 @@ export default class Main extends Component {
     </View>
   );
 
+  loadMore = () => {
+    const {page, productInfo} = this.state;
+
+    if (page === productInfo.pages) {
+      return;
+    }
+
+    const pageNumber = page + 1;
+
+    this.loadProducts(pageNumber);
+  };
+
   render() {
     const {products} = this.state;
     return (
@@ -90,6 +106,8 @@ export default class Main extends Component {
           data={products}
           keyExtractor={item => item._id}
           renderItem={this.renderItem}
+          onEndReached={this.loadMore}
+          onEndReachedThreshold={0.1}
         />
       </View>
     );
